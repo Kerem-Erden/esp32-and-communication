@@ -1,0 +1,7 @@
+# derleme çıktıları
+*.exe
+*.o
+*.obj
+build/
+sdkconfig.old
+.vscode/
