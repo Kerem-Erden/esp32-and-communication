@@ -1,157 +1,115 @@
-# CAN + C Çalışma Planı (60 gün)
+# Isuzu CAN Projesi – Anlama Planı (31 gün)
 
-Amaç: Isuzu projesindeki `firmware/esp32-gateway` kodunu (saf C, ESP-IDF) satır satır anlayan, C'yi kendi
-başına yazabilen ve CAN/OBD/ISO-TP'yi açıklayabilen biri olmak. C# masaüstü uygulaması kapsam dışıdır.
+## Hedef
 
-İncelenen kod, ayrı bir repo olan `../isuzu-diagnostic-system` içinde, `main` = `b98ccd5` (Codex öncesi):
-`firmware/esp32-gateway/main/`. O repoda yalnızca okuma yapılır; bütün çalışmalar bu repoya yazılır.
+CV'deki Isuzu teşhis projesini **anlayarak savunabilmek**: projedeki her kararın *neden* öyle verildiğini,
+CAN protokolünün ilgili parametresini ve alternatiflerini kendi cümlelerimle anlatabilmek; bunu yaparken
+gömülü C mülakatlarında sorulan C konularını da öğrenmek.
+Hedef: projeyle ilgili soruların **%85–90'ına** ezber değil, anlayarak cevap vermek.
 
-## learnesp32 ile birlikte
+* Kapsam: ESP32 firmware'i (C), CAN, OBD-II, ISO-TP, donanım ve tasarım tercihleri, gömülü C.
+* Kapsam dışı: C# masaüstü uygulaması.
+* İncelenen kod: `../isuzu-diagnostic-system` → `firmware/esp32-gateway/main/` (main = `b98ccd5`, Codex öncesi).
+  O repoda yalnızca okuma yapılır.
 
-Bu planla aynı dönemde **learnesp32** kursuna da çalışılıyor. Oturumun başında kursta hangi derste
-olduğunuzu söyleyin; o günün konusunu kursla bağlarız. Kurs alıştırmalarınızı bu repoda `learnesp32/`
-klasörüne koyabilirsiniz. ESP-IDF ve FreeRTOS konularını (Hafta 6) kursta önden görürseniz o hafta kısalır,
-CAN haftalarına daha çok zaman kalır.
+## Her gün (30 dk, en fazla 1 saat)
 
-## Nasıl çalışıyoruz
+1. **Kavram (≈15 dk):** konu, proje hiç yokmuş gibi sıfırdan öğrenilir.
+2. **Projede (≈10 dk):** kavram firmware'de nerede, nasıl ve **neden böyle** uygulanmış. C, kodun içinde
+   ihtiyaç duyuldukça öğrenilir (tablodaki **C** sütunu).
+3. **Kendin anlat (≈5 dk):** konuyu kendi cümlelerimle anlatırım. Ezber cevap yok; anlatamadığım yer
+   eksik olan yerdir. Düzeltilmiş anlatım `docs/mulakat-notlari.md` dosyasına eklenir.
 
-* **Günde 30 dakika**, en fazla 1 saat. Bitmeyen gün ertesi güne taşınır; plan yarışma değil.
-* Haftada 5 gün. Her haftanın 6. günü **tekrar** günüdür (kısa sınav + mini program).
-* Her oturum aynı düzende:
-  1. **5 dk** – dünün tekrarı (ben 2-3 soru sorarım, siz cevaplarsınız)
-  2. **15 dk** – konu + projedeki gerçek kodu birlikte okuma
-  3. **10 dk** – alıştırma: **C kodunu siz yazarsınız**, ben inceler, hataları açıklarım
-* Çözümü önce siz denersiniz. Takılırsanız önce ipucu, sonra çözüm (Learning Mode).
-* Alıştırmalar PC'de, kartsız derlenir:
-  ```bash
-  gcc -std=c11 -Wall -Wextra -o gunler/gun03/gun03.exe gunler/gun03/main.c
-  ```
-  Dosyalar bu repoda `gunler/gunXX/` klasörüne konur; her günün sonunda yerelde commit edilir
-  (GitHub'a yalnızca siz açıkça isterseniz gönderilir).
-* 🔧 işaretli adımlar karta/donanıma dokunur. Bunlar **o gün ayrıca sizin izninizle** yapılır;
-  araca bağlanmak ve araca aktif CAN mesajı göndermek bu planın parçası değildir.
+* ✍️ işaretli günlerde projeyle ilgili kısa bir parçayı **kendim yazarım**, sonra projedeki halle karşılaştırırım.
+  Kod `gunler/gunXX/` klasörüne konur, `gcc -std=c11 -Wall -Wextra` ile derlenir.
+* Her bölümün son günü **toparlama**dır: bölümün tamamını baştan sona anlatma provası.
+* 🔧 işaretli adımlar karta dokunur ve yalnızca o gün ayrıca verilen izinle yapılır. Araca bağlanmak ve araca
+  aktif CAN mesajı göndermek bu planın parçası değildir.
+* C yazma pratiğinin asıl yeri **learnesp32** kursudur; bu plan onu projeyle bağlar.
 
-## Hafta 1 – Başlangıç ve C'nin temelleri
+## Gün 1 – Başlangıç ✅
 
-| Gün | Konu | Projedeki kod | Alıştırma (siz yazarsınız) |
+Proje haritası (araç → CAN → transceiver → ESP32 → UART → PC); derleme süreci (ön işlemci, derleyici,
+assembler, linker); `gcc -E / -S / -c`; `printf` → `puts` optimizasyonu; dinamik (PC) ve statik (ESP32) bağlama.
+
+## Bölüm A – CAN'in temelleri
+
+| Gün | Kavram | Projede / tercih sorusu | C |
 |---|---|---|---|
-| 1 | Proje haritası: araç → CAN → transceiver → ESP32 → UART → PC. Derleme adımları (ön işlemci, derleyici, linker) | `firmware/esp32-gateway/main/` 5 modül | İlk C programı; `gcc` ile derleyip çalıştırma |
-| 2 | Tipler, `stdint.h` (`uint8_t`, `uint32_t`, `int64_t`), neden sabit genişlik | `can_bus.h` → `can_bus_frame_t` | `sizeof` tablosu; `uint8_t` taşma deneyi (255 + 1) |
-| 3 | Hex/binary, `printf` biçimleri (`%u %X %02X`), `inttypes.h` | `0x7DF`, `0x7E8`, `CAN_STANDARD_MAX_ID 0x7FF` | Bir sayıyı onlu/hex/ikili yazan fonksiyon |
-| 4 | Kontrol akışı: `if`, `switch`, `for`, `while`, `continue` | `esp32_gateway.c` → `process_serial_input` | String sabitinden `'\n'` ile satır ayıran döngü |
-| 5 | Fonksiyonlar, prototip, dönüş değeri, `static` fonksiyon | `esp32_gateway.c` static fonksiyonlar | RPM formülü fonksiyonu `(A*256+B)/4` |
-| 6 | **Tekrar** | — | Mini program: 3 PID değerini hesaplayıp tablo yazdır |
+| 2 | CAN neden var: araç içi ağ, çok efendili (multi-master) bus, OBD konnektörü (pin 6 CANH, pin 14 CANL) | "Araçlarda neden UART ya da RS-485 değil de CAN?" | — |
+| 3 | Fiziksel katman: diferansiyel sinyal, dominant/recessive, CANH/CANL gerilimleri, 2 × 120 Ω sonlandırma | Masadaki ölçümler hangi değerleri göstermeli | — |
+| 4 | Frame yapısı: SOF, ID, RTR, IDE, DLC, data, CRC, ACK, EOF; 11 bit / 29 bit ID | `can_bus_frame_t` alanları neden bu tiplerde | `stdint` tipleri, işaretli/işaretsiz, taşma; **struct padding ve hizalama** (`sizeof(can_bus_frame_t)` kaç?) |
+| 5 | Arbitration: düşük ID'nin bit bit kazanması | "İki ECU aynı anda konuşursa ne olur?" | bit kaydırma ve maske ile ID'nin bitlerini okumak |
+| 6 | Bit timing, bitrate (500k / 250k), sample point | Projede bitrate'in otomatik denenmesi (`probe_can_bitrate`) – neden? | `enum` (`can_bus_bitrate_t`), `#define` |
+| 7 | ACK ve hata yönetimi: hata türleri, TEC/REC, error-active/passive, bus-off | `can_bus_print_diagnostics`; "ACK'siz bir hatta ne olur?" | `switch` ile enum'dan metne çevirme |
+| 8 | Listen-only mod: hattı ACK vermeden dinlemek | Projede varsayılan modun **passive** olması – güvenlik tercihi | — |
+| 9 | **Toparlama** | CAN bölümünü baştan sona anlatma | — |
 
-## Hafta 2 – Bit işlemleri, diziler, struct, enum, modüller
+## Bölüm B – Donanım ve tercihler
 
-| Gün | Konu | Projedeki kod | Alıştırma |
+| Gün | Kavram | Projede / tercih sorusu | C |
 |---|---|---|---|
-| 7 | Bit işlemleri `& \| ^ ~ << >>`, maske, nibble | `obd_protocol.c` → `data[0] >> 4`, `data[0] & 0x0F` | Bit set/clear/test fonksiyonları; nibble ayırma |
-| 8 | Diziler, indeks sınırları, `sizeof(a)/sizeof(a[0])` | `uint8_t data[8]` | 8 byte'ı `04 41 0C 1A F8 00 00 00` biçiminde yazdır |
-| 9 | `struct`, `typedef`, designated initializer (`.baud_rate = …`) | `can_bus_frame_t`, `uart_config_t`, `node_config` | Kendi frame struct'ınızı doldurup yazdırın |
-| 10 | `enum`, enum üzerinde `switch` | `can_bus_status_t`, `can_bus_mode_t`, `can_bus_bitrate_t` | `status_to_string()` |
-| 11 | `.h`/`.c` ayrımı, include guard, derleme birimi, `static` vs `extern` | `can_bus.h` / `can_bus.c` | Alıştırmayı `frame.h`, `frame.c`, `main.c` dosyalarına bölüp birlikte derleyin |
-| 12 | **Tekrar** | — | Mini program: frame oluştur → yazdır → alanları doğrula |
+| 10 | Transceiver nedir; SN65HVD230 pinleri (D, R, Rs, Vref), Rs modları | Modül bağlantısı (D21 → CTX, D22 → CRX) | — |
+| 11 | 3,3 V ve 5 V lojik, GPIO toleransı | "Neden TJA1050 / MCP2551 değil de SN65HVD230?" | — |
+| 12 | Dahili CAN denetleyicisi ve harici denetleyici (SPI) | "Neden MCP2515 değil de ESP32'nin dahili TWAI'si?", "Neden STM32 ya da Arduino değil?" | — |
+| 13 | Hata ayıklama metodolojisi: katman katman daraltma | CRX'in hep recessive kalması, GPIO echo testi (`can_bus_run_transceiver_test`), loopback'in yalnızca denetleyicinin içini test etmesi, multimetre ölçümleri | GPIO okuma/yazma kodu |
+| 14 | **Toparlama** | "Donanımı nasıl seçtin, arızayı nasıl buldun?" | — |
 
-## Hafta 3 – Pointer'lar ve hata yönetimi
+## Bölüm C – ESP32 firmware'i
 
-| Gün | Konu | Projedeki kod | Alıştırma |
+| Gün | Kavram | Projede / tercih sorusu | C |
 |---|---|---|---|
-| 13 | Pointer: adres, `&`, `*`, `NULL` | — | `swap(int *a, int *b)` |
-| 14 | Struct pointer'ı, `->`, çıkış parametresi, `const` pointer | `obd_build_pid_request(const … *request, can_bus_frame_t *out_frame)` | Out-param ile frame dolduran fonksiyon |
-| 15 | Pointer ve dizi, pointer aritmetiği, fonksiyona dizi + uzunluk geçme | `memcpy`, `data` kopyalama | Buffer üzerinde toplam/arama fonksiyonu |
-| 16 | Hata döndürme: `bool`, `esp_err_t`, erken `return`, hata yolunda kaynak temizleme | `can_bus_init` hata yolları | Üç adımlı init; her hata yolu kendinden öncekileri geri alsın |
-| 17 | Bellek bölgeleri: stack, static, heap. Modül durumu (`s_` değişkenleri), static yerel değişken | `s_twai_node`, `s_rx_queue`, `process_serial_input` içindeki static buffer | Çağrı sayacı; stack'teki adresi döndürme hatasını görme |
-| 18 | **Tekrar** | — | Mini proje: "frame yazıcı" modülü (`.h` + `.c` + test) |
+| 15 | ESP-IDF, Arduino ve proje yapısı; C mi C++ mı; build → `.bin` → flash | "Neden Arduino değil de ESP-IDF?", "Neden C?" | **bellek düzeni**: flash, `.data`, `.bss`, stack, heap; `.h`/`.c` ayrımı, include guard |
+| 16 | FreeRTOS temelleri: task, tick, `app_main` | Ana döngünün akışı (`esp32_gateway.c`) | `static` fonksiyon ve `static` yerel değişken |
+| 17 | TWAI sürücüsünü başlatma | `can_bus_init`: modlar, `tx_gpio = -1` tasarımı | struct, designated initializer, modül durumu (`s_` değişkenleri) |
+| 18 | Kesme (ISR) ve kuyruk; ISR'de neden iş yapılmaz | `can_bus_rx_callback` → `s_rx_queue` → `can_bus_receive` | pointer, **function pointer** (callback), `volatile`; **`malloc`/heap** – `xQueueCreate` heap kullanır, gömülüde neden dikkatli olunur |
+| 19 | Gönderme yolu, otomatik tekrar gönderme (retransmission) | `fail_retry_cnt = 0` – neden tekrar yok?; passive modda gönderme yasağı | **`const` ve pointer** (`const can_bus_frame_t *frame`; `const int *` / `int * const`) |
+| 20 | Hata yolları ve kaynak temizleme | `can_bus_init` / `deinit` hata yolları | hata kodları (`esp_err_t`), erken `return`, `NULL` kontrolü |
+| 21 | Pasif trafik analizi | `can_stats.c`: hangi ID ne sıklıkla geliyor – neden gerekli? | sabit boyutlu dizi, lineer arama |
+| 22 | **Toparlama** | "Firmware'in mimarisini anlat" | — |
 
-## Hafta 4 – Stringler ve buffer güvenliği
+## Bölüm D – OBD-II ve ISO-TP
 
-| Gün | Konu | Projedeki kod | Alıştırma |
+| Gün | Kavram | Projede / tercih sorusu | C |
 |---|---|---|---|
-| 19 | C string'i: `char` dizisi, `'\0'`, `strlen`, string literal | `request_line[request_length] = '\0'` | Kendi `my_strlen` fonksiyonunuz |
-| 20 | `snprintf`, buffer boyutu, kesilme, taşma | `gateway_protocol.c` → `write_response` | Cevap satırı üret; küçük buffer'la kesilmeyi test et |
-| 21 | Parse: `strcmp`, `strncmp`, `strtol`, girdi doğrulama | `parse_request_id`, `remove_line_ending` | `"REQ\|42\|PING"` satırını parçala |
-| 22 | `gateway_protocol.c`'nin tamamını okuma; tanımsız davranış örnekleri | `gateway_protocol_handle_line` | Kodda bulduğunuz riskleri listeleyin |
-| 23 | `assert` ile test yazma | — | Mini parser + 10 test vakası |
-| 24 | **Tekrar** | — | Satır tabanlı protokolün PC'de çalışan sürümü |
+| 23 | OBD-II: servisler (modlar), fonksiyonel `0x7DF` / fiziksel `0x7E0` istek, `0x7E8` cevap | Projede neden `0x7DF` kullanılmış; artısı ve eksisi | out-parametre ile frame doldurma |
+| 24 | Mode 01 PID'leri ve formülleri | `obd_decode_pid_response`: RPM = (A·256 + B) / 4 | bit işlemleri, hex; **endianness** (A·256 + B neden big-endian?); **`union`** ile aynı byte'lara iki farklı bakış ✍️ RPM decoder |
+| 25 | Mode 03: DTC'nin 2 byte'tan `P0301` gibi bir koda çevrilmesi | `obd_decode_dtc` | bit maskeleri, `char` dizisi, `'\0'` ✍️ DTC decoder |
+| 26 | ISO-TP: Single/First/Consecutive Frame, Flow Control; neden gerekli | Projenin tek frame sınırı (`OBD_MAX_DTCS_SINGLE_FRAME 3`) ve sonucu | buffer yönetimi, durum makinesi ✍️ çok frame'li bir cevabı birleştirme |
+| 27 | Zaman aşımı, negatif cevap (NRC `0x7F`, `0x78`), birden çok ECU'nun cevap vermesi | `obd_wait_pid_response` – neyi doğru, neyi eksik yapıyor | `int64_t` zaman hesabı, taşma |
+| 28 | **Toparlama** | "Araçtan RPM'i nasıl okuyorsun? Uçtan uca anlat" | — |
 
-## Hafta 5 – CAN teorisi
+## Bölüm E – Mimari ve kapanış
 
-| Gün | Konu | Projedeki kod | Alıştırma |
+| Gün | Kavram | Projede / tercih sorusu | C |
 |---|---|---|---|
-| 25 | CAN nedir: bus, düğüm, OBD konnektörü (pin 6 CANH, pin 14 CANL) | — | Sistemi kağıda çizin |
-| 26 | Fiziksel katman: diferansiyel sinyal, dominant/recessive, gerilimler, 2 × 120 Ω = 60 Ω | — | Ölçüm tablosu: hangi durumda hangi gerilim |
-| 27 | Transceiver SN65HVD230: D, R, Rs, Vref pinleri; GPIO echo testi | `can_bus_run_transceiver_test` | 🔧 (isteğe bağlı) Multimetre ölçümleri: masadaki "CRX takılı" arızası |
-| 28 | Frame: SOF, ID, RTR, IDE, DLC, data, CRC, ACK, EOF; standart/extended ID; arbitration | `is_extended`, `is_remote`, `dlc` | İki ID'den arbitration'ı hangisinin kazandığını bit bit hesaplayan fonksiyon |
-| 29 | Bit timing, bitrate, sample point; yanlış bitrate'te ne olur | `probe_can_bitrate` | Bit süresi ve frame süresi hesaplayıcı |
-| 30 | Hatalar: error frame, TEC/REC, error-active/passive, bus-off | `can_bus_print_diagnostics` | TEC/REC değerinden durum hesaplayan fonksiyon |
+| 29 | Seri haberleşme: satır tabanlı metin protokolü, request id, 115200 baud | "Neden binary değil de metin?", UART'ın log çıktısıyla paylaşılması | string parse etme, `snprintf`, **buffer taşması** |
+| 30 | Katmanlı mimari ve güvenlik tasarımı | Firmware/PC ayrımı, passive varsayılan, araca yazma işlemi olmaması | ön işlemci anahtarları (`#if`, `OBD_VEHICLE_TEST_ENABLED`), makro tuzakları |
+| 31 | **Başarısızlık analizi ve son prova** | "Ne yanlış gitti, ne öğrendin, bugün ne farklı yapardın?"; projeyi baştan sona anlatma | — |
 
-## Hafta 6 – ESP-IDF ve FreeRTOS
+## Gömülü C mülakat konuları – nerede işleniyor
 
-| Gün | Konu | Projedeki kod | Alıştırma |
-|---|---|---|---|
-| 31 | ESP-IDF proje yapısı: `CMakeLists.txt`, `main` component'i, `sdkconfig`, `idf.py` | `firmware/esp32-gateway/` | 🔧 Yalnızca `idf.py build` (flash yok) |
-| 32 | `app_main`, task, tick, `vTaskDelay`, `pdMS_TO_TICKS` | `esp32_gateway.c` → `app_main` | Ana döngünün akış şemasını çizin |
-| 33 | Kuyruk: `xQueueCreate/Send/Receive`, `FromISR` sürümleri, kopyalayarak taşıma | `s_rx_queue` | PC'de dairesel kuyruk (ring buffer) yazın |
-| 34 | Kesme ve callback kuralları: kısa, bloklamayan; `user_ctx`, `volatile` | `can_bus_rx_callback` | Callback'te yapılmaması gerekenleri listeleyin |
-| 35 | UART: `uart_config_t`, `uart_read_bytes`, `printf` ile aynı UART | `initialize_serial_input` | Seri girdiyi taklit eden PC programı |
-| 36 | **Tekrar** | — | Ring buffer + satır ayırıcıyı birleştirin |
-
-## Hafta 7 – `can_bus.c` derin okuma
-
-| Gün | Konu | Projedeki kod | Alıştırma |
-|---|---|---|---|
-| 37 | Init satır satır: modlar, listen-only, `tx_gpio = -1` tasarımı | `can_bus_init` | Passive/diagnostic farkını kendi cümlelerinizle yazın |
-| 38 | Durum makinesi: start/stop/deinit | `can_bus_start/stop/deinit`, `s_can_status` | Aynı durum makinesini PC'de stub'larla kurun |
-| 39 | RX yolu: callback → kuyruk → `can_bus_receive`; kuyruk dolarsa ne olur | `can_bus_rx_callback`, `can_bus_receive` | Kayıp frame sayacı ekleme tasarımı |
-| 40 | TX yolu: ID/DLC doğrulama, zaman aşımı; passive modda TX neden yasak | `can_bus_transmit`, `test_obd_passive_tx_guard` | `validate_frame()` fonksiyonu + testler |
-| 41 | Loopback ve transceiver testleri; loopback neden yalnızca denetleyicinin içini test eder | `can_bus_run_loopback_test` | Test sonuçlarını yorumlayan karar tablosu |
-| 42 | **Tekrar + kod inceleme** | `can_bus.c/.h` | Bulduğunuz hata ve iyileştirme listesi |
-
-## Hafta 8 – `can_stats` ve OBD-II
-
-| Gün | Konu | Projedeki kod | Alıştırma |
-|---|---|---|---|
-| 43 | Sabit boyutlu tablo, lineer arama, periyot hesabı | `can_stats.c` | Aynı modülü PC'de yazıp test edin |
-| 44 | OBD-II: modlar, `0x7DF` fonksiyonel / `0x7E0` fiziksel istek, `0x7E8` cevap, `+0x40`, NRC `0x7F` | `obd_protocol.c` sabitleri | İstek/cevap frame'lerini elle yazın |
-| 45 | Mode 01 PID formülleri | `obd_decode_pid_response` | 4 PID decoder'ı + test vektörleri |
-| 46 | Mode 03 DTC kodlaması: 2 byte → `P0301` | `obd_decode_dtc` | Decoder'ı kendiniz yazın + testler |
-| 47 | İstek/bekleme, zaman aşımı, yanlış cevabı ayıklama, birden çok ECU | `obd_request_pid`, `obd_wait_pid_response` | Riskleri listeleyin |
-| 48 | **Tekrar** | — | Ham frame alıp decode eden mini OBD kütüphanesi |
-
-## Hafta 9 – ISO-TP (sizin yazacağınız modül)
-
-| Gün | Konu | Projedeki kod | Alıştırma |
-|---|---|---|---|
-| 49 | ISO-TP: Single/First/Consecutive Frame, Flow Control, sıra no, BS, STmin | `OBD_MAX_DTCS_SINGLE_FRAME 3` (bugünkü sınır) | Örnek çok frame'li cevabı elle çözün |
-| 50 | Alıcı tasarımı: durum makinesi, buffer, hata durumları | — | Tasarımı kağıda yazın; ben inceleyeyim |
-| 51 | Uygulama 1: SF + FF | — | `isotp.h` / `isotp.c` |
-| 52 | Uygulama 2: CF + sıra kontrolü + zaman aşımı | — | Devamı |
-| 53 | Test: 10 DTC'lik çok frame'li cevap, kayıp frame, yanlış sıra | — | Test dosyası |
-| 54 | **Tekrar** | — | Tasarım değerlendirmesi |
-
-## Hafta 10 – Bütünleşme ve kapanış
-
-| Gün | Konu | Projedeki kod | Alıştırma |
-|---|---|---|---|
-| 55 | Ana döngünün tamamı | `process_serial_input`, `process_can_input` | Uçtan uca akış şeması |
-| 56 | Ön işlemci: `#define`, `#if`, makro tuzakları, derleme zamanı anahtarları | `OBD_VEHICLE_TEST_ENABLED`, `CAN_AUTO_BITRATE_PROBE_ENABLED` | Güvenli bir makro yazın |
-| 57 | Güvenlik analizi: kod hangi koşulda hatta aktif mesaj gönderebilir? | Tüm firmware | Risk listesi |
-| 58 | ISO-TP'yi firmware'e entegre etme tasarımı | `obd_protocol.c` | 🔧 Yalnızca build |
-| 59 | Bulunan sorunları önceliklendirme | — | Sorun listesi |
-| 60 | Kapanış: aynı modülün C++ sürümüne bakış, sonraki yol | — | — |
+| Konu | Gün |
+|---|---|
+| `stdint` tipleri, taşma | 4 |
+| Struct padding ve hizalama | 4 |
+| Bit işlemleri ve maskeler | 5, 24, 25 |
+| `enum`, `#define`, ön işlemci | 6, 30 |
+| Bellek düzeni (flash, `.data`, `.bss`, stack, heap) | 15 |
+| `static` | 16, 17 |
+| Pointer, function pointer, `volatile` | 18 |
+| `malloc` / heap | 18 |
+| `const` ve pointer | 19 |
+| Hata kodları ve kaynak temizleme | 20 |
+| Endianness, `union` | 24 |
+| String, `char` dizisi, buffer taşması | 25, 29 |
+| Durum makinesi | 26 |
 
 ## İlerleme
 
-Bitirdiğiniz günü `[x]` yapın; bir sonraki oturumda kaldığımız yeri buradan buluruz.
-
-- [ ] Hafta 1 (gün 1–6)
-- [ ] Hafta 2 (gün 7–12)
-- [ ] Hafta 3 (gün 13–18)
-- [ ] Hafta 4 (gün 19–24)
-- [ ] Hafta 5 (gün 25–30)
-- [ ] Hafta 6 (gün 31–36)
-- [ ] Hafta 7 (gün 37–42)
-- [ ] Hafta 8 (gün 43–48)
-- [ ] Hafta 9 (gün 49–54)
-- [ ] Hafta 10 (gün 55–60)
+- [x] Gün 1 – Başlangıç
+- [ ] Bölüm A – CAN'in temelleri (2–9)
+- [ ] Bölüm B – Donanım ve tercihler (10–14)
+- [ ] Bölüm C – ESP32 firmware'i (15–22)
+- [ ] Bölüm D – OBD-II ve ISO-TP (23–28)
+- [ ] Bölüm E – Mimari ve kapanış (29–31)
