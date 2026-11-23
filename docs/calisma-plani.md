@@ -22,6 +22,7 @@ Hedef: projeyle ilgili soruların **%85–90'ına** ezber değil, anlayarak ceva
    eksik olan yerdir. Ardından mülakatçı gibi 1–2 **takip sorusu** gelir ("peki neden?", "ya şu olsaydı?").
    Düzeltilmiş anlatım `docs/mulakat-notlari.md` dosyasına eklenir.
 
+* Her dersin sonunda WhatsApp için kısa bir **tekrar metni** hazırlanır: `docs/tekrar-metinleri.md`.
 * ✍️ işaretli günlerde projeyle ilgili kısa bir parçayı **kendim yazarım**, sonra projedeki halle karşılaştırırım.
   Kod `gunler/gunXX/` klasörüne konur, `gcc -std=c11 -Wall -Wextra` ile derlenir.
 * Her bölümün son günü **toparlama**dır: bölümün tamamını baştan sona anlatma provası.
