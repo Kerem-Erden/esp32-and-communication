@@ -14,11 +14,13 @@ Hedef: projeyle ilgili soruların **%85–90'ına** ezber değil, anlayarak ceva
 
 ## Her gün (30 dk, en fazla 1 saat)
 
+0. **Tekrar (≈2 dk):** önceki günlerden rastgele bir soru. Cevaplayamazsam o günün notuna dönerim.
 1. **Kavram (≈15 dk):** konu, proje hiç yokmuş gibi sıfırdan öğrenilir.
 2. **Projede (≈10 dk):** kavram firmware'de nerede, nasıl ve **neden böyle** uygulanmış. C, kodun içinde
    ihtiyaç duyuldukça öğrenilir (tablodaki **C** sütunu).
 3. **Kendin anlat (≈5 dk):** konuyu kendi cümlelerimle anlatırım. Ezber cevap yok; anlatamadığım yer
-   eksik olan yerdir. Düzeltilmiş anlatım `docs/mulakat-notlari.md` dosyasına eklenir.
+   eksik olan yerdir. Ardından mülakatçı gibi 1–2 **takip sorusu** gelir ("peki neden?", "ya şu olsaydı?").
+   Düzeltilmiş anlatım `docs/mulakat-notlari.md` dosyasına eklenir.
 
 * ✍️ işaretli günlerde projeyle ilgili kısa bir parçayı **kendim yazarım**, sonra projedeki halle karşılaştırırım.
   Kod `gunler/gunXX/` klasörüne konur, `gcc -std=c11 -Wall -Wextra` ile derlenir.
@@ -44,6 +46,18 @@ assembler, linker); `gcc -E / -S / -c`; `printf` → `puts` optimizasyonu; dinam
 | 7 | ACK ve hata yönetimi: hata türleri, TEC/REC, error-active/passive, bus-off | `can_bus_print_diagnostics`; "ACK'siz bir hatta ne olur?" | `switch` ile enum'dan metne çevirme |
 | 8 | Listen-only mod: hattı ACK vermeden dinlemek | Projede varsayılan modun **passive** olması – güvenlik tercihi | — |
 | 9 | **Toparlama** | CAN bölümünü baştan sona anlatma | — |
+
+### 🔧 Donanım hattı (Bölüm A boyunca, isteğe bağlı ek süre)
+
+Hedef: Bölüm A bitmeden masada **gerçek CAN trafiği** görmek, böylece sonraki dersler teoriden pratiğe geçer.
+Her adım yalnızca o gün verilen izinle yapılır; araç kullanılmaz.
+
+1. Enerji yokken CANH–CANL direnci (beklenen: tek modülde ≈ 120 Ω).
+2. Enerji varken boşta CANH, CANL ve CRX gerilimleri (≈ 2,3 V, ≈ 2,3 V, ≈ 3,3 V).
+3. CRX arızasını bulmak: modül mü, bağlantı mı, ESP32 pini mi? Gerekirse modülü değiştirmek.
+4. İkinci bir düğümle (ikinci ESP32 + transceiver ya da USB-CAN adaptörü) iki yönlü frame alışverişi.
+
+Gün 13 bu hattın sonuçlarını mülakat hikâyesi olarak anlatır.
 
 ## Bölüm B – Donanım ve tercihler
 
