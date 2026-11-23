@@ -55,7 +55,7 @@ Her adım yalnızca o gün verilen izinle yapılır; araç kullanılmaz.
 1. Enerji yokken CANH–CANL direnci (beklenen: tek modülde ≈ 120 Ω).
 2. Enerji varken boşta CANH, CANL ve CRX gerilimleri (≈ 2,3 V, ≈ 2,3 V, ≈ 3,3 V).
 3. CRX arızasını bulmak: modül mü, bağlantı mı, ESP32 pini mi? Gerekirse modülü değiştirmek.
-4. İkinci bir düğümle (ikinci ESP32 + transceiver ya da USB-CAN adaptörü) iki yönlü frame alışverişi.
+4. İkinci düğümle (elde 2 ESP32 + 2 SN65HVD230 var) iki yönlü frame alışverişi.
 
 Gün 13 bu hattın sonuçlarını mülakat hikâyesi olarak anlatır.
 
