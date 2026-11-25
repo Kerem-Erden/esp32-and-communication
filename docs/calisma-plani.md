@@ -41,7 +41,7 @@ assembler, linker); `gcc -E / -S / -c`; `printf` → `puts` optimizasyonu; dinam
 |---|---|---|---|
 | 2 ✅ | CAN neden var: araç içi ağ, çok efendili (multi-master) bus, OBD konnektörü (pin 6 CANH, pin 14 CANL) | "Araçlarda neden UART ya da RS-485 değil de CAN?" | — |
 | 3 ✅ | Fiziksel katman: diferansiyel sinyal, dominant/recessive, CANH/CANL gerilimleri, 2 × 120 Ω sonlandırma | Masadaki ölçümler hangi değerleri göstermeli | — |
-| 4 | Frame yapısı: SOF, ID, RTR, IDE, DLC, data, CRC, ACK, EOF; 11 bit / 29 bit ID | `can_bus_frame_t` alanları neden bu tiplerde | `stdint` tipleri, işaretli/işaretsiz, taşma; **struct padding ve hizalama** (`sizeof(can_bus_frame_t)` kaç?) |
+| 4 ✅ | Frame yapısı: SOF, ID, RTR, IDE, DLC, data, CRC, ACK, EOF; 11 bit / 29 bit ID | `can_bus_frame_t` alanları neden bu tiplerde | `stdint` tipleri, işaretli/işaretsiz, taşma; **struct padding ve hizalama** (`sizeof(can_bus_frame_t)` kaç?) |
 | 5 | Arbitration: düşük ID'nin bit bit kazanması | "İki ECU aynı anda konuşursa ne olur?" | bit kaydırma ve maske ile ID'nin bitlerini okumak |
 | 6 | Bit timing, bitrate (500k / 250k), sample point | Projede bitrate'in otomatik denenmesi (`probe_can_bitrate`) – neden? | `enum` (`can_bus_bitrate_t`), `#define` |
 | 7 | ACK ve hata yönetimi: hata türleri, TEC/REC, error-active/passive, bus-off | `can_bus_print_diagnostics`; "ACK'siz bir hatta ne olur?" | `switch` ile enum'dan metne çevirme |
@@ -123,7 +123,7 @@ Gün 13 bu hattın sonuçlarını mülakat hikâyesi olarak anlatır.
 ## İlerleme
 
 - [x] Gün 1 – Başlangıç
-- [ ] Bölüm A – CAN'in temelleri (2–9) – Gün 2–3 ✅, sıradaki: Gün 4
+- [ ] Bölüm A – CAN'in temelleri (2–9) – Gün 2–4 ✅, sıradaki: Gün 5
 - [ ] Bölüm B – Donanım ve tercihler (10–14)
 - [ ] Bölüm C – ESP32 firmware'i (15–22)
 - [ ] Bölüm D – OBD-II ve ISO-TP (23–28)

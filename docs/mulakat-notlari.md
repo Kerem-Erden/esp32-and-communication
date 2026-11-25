@@ -31,3 +31,22 @@ ve geri yansıyıp sonraki bitleri bozmaz. Dirençler ayrıca dominant bitten so
 
 **Karıştırma:** ACK'yi gönderen değil, frame'i doğru alan alıcı yazar. Gönderen ACK slot'unu 1 bırakır,
 alıcı oraya 0 basar.
+
+## Gün 4 – CAN frame'inde hangi alanlar var? Struct'ta neden CRC ya da ACK yok?
+
+Klasik CAN frame'i şu alanlardan oluşur: SOF (1 bit, başlangıç ve senkron), ID (11 bit, içerik ve öncelik;
+arbitration burada olur), RTR (veri frame'i mi istek frame'i mi), IDE (ID 11 bit mi 29 bit mi), r0, DLC
+(4 bit, kaç byte veri var), DATA (0–8 byte), CRC (15 bit + ayraç, hata kontrolü), ACK (slot + ayraç, alıcının
+"aldım" işareti) ve EOF (7 recessive bit).
+
+SOF, CRC, ACK ve EOF'u CAN denetleyicisi donanımda ekler. Yazılım yalnızca ID, IDE, RTR, DLC ve data'yı verir.
+Bu yüzden `can_bus_frame_t` sadece bu alanları tutar. `timestamp_us` frame'de yoktur; yazılım, frame'in ne
+zaman geldiğini bilmek için ekler. `id` 29 bit'e kadar çıkabildiği için `uint32_t`. `dlc` ile `data_length`
+ayrı, çünkü DLC bir koddur: CAN FD'de 9–15 değerleri 12–64 byte demektir.
+
+**Takip soruları:**
+- 29 bitlik frame gelirse: IDE = 1 olur. Projedeki OBD kodu bu frame'leri **atar** (`obd_protocol.c:48`),
+  çünkü yalnızca 11 bitlik `0x7DF` / `0x7E8` ile çalışır. Bu bir sınırlamadır: OBD-II 29 bitlik ID'lere de izin
+  verir (`0x18DB33F1` gibi) ve bazı ağır vasıtalar bunu kullanır.
+- 8 byte'tan uzun veri: ISO-TP ile parçalara bölünür: First Frame, alıcıdan Flow Control, ardından Consecutive
+  Frame'ler.
