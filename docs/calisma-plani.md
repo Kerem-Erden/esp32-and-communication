@@ -53,7 +53,7 @@ assembler, linker); `gcc -E / -S / -c`; `printf` → `puts` optimizasyonu; dinam
 Hedef: Bölüm A bitmeden masada **gerçek CAN trafiği** görmek, böylece sonraki dersler teoriden pratiğe geçer.
 Her adım yalnızca o gün verilen izinle yapılır; araç kullanılmaz.
 
-1. Enerji yokken CANH–CANL direnci (beklenen: tek modülde ≈ 120 Ω).
+1. ✅ Enerji yokken CANH–CANL direnci: tek modülde ≈ 70 Ω (beklenen 120), ikisi bağlı ≈ 35 Ω.
 2. Enerji varken boşta CANH, CANL ve CRX gerilimleri (≈ 2,3 V, ≈ 2,3 V, ≈ 3,3 V).
 3. CRX arızasını bulmak: modül mü, bağlantı mı, ESP32 pini mi? Gerekirse modülü değiştirmek.
 4. İkinci düğümle (elde 2 ESP32 + 2 SN65HVD230 var) iki yönlü frame alışverişi.

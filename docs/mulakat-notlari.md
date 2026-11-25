@@ -50,3 +50,11 @@ ayrı, çünkü DLC bir koddur: CAN FD'de 9–15 değerleri 12–64 byte demekti
   verir (`0x18DB33F1` gibi) ve bazı ağır vasıtalar bunu kullanır.
 - 8 byte'tan uzun veri: ISO-TP ile parçalara bölünür: First Frame, alıcıdan Flow Control, ardından Consecutive
   Frame'ler.
+
+## 🔧 Donanım ölçümü 1 – Sonlandırma direnci (enerji yok, DT830D, 200 Ω kademesi)
+
+- SN65-A tek başına: ≈ 70,6 Ω, SN65-B tek başına: ≈ 70,4 Ω, A ve B bağlı: ≈ 34–35,6 Ω.
+- Paralel bağlantı tam yarıya düşüyor, yani iki modülde de sonlandırma var ama ≈ 70 Ω, standart 120 Ω değil.
+- Hat ≈ 35 Ω oluyor (beklenen 60 Ω): transceiver'a daha fazla yük biner. Kısa masa hattında sorun olmaz;
+  sorun çıkarsa bir direnç sökülür ya da 120 Ω ile değiştirilir.
+- Mülakat cümlesi: "Ucuz modüllerde sonlandırma 120 Ω değildi, ölçerek fark ettim."
