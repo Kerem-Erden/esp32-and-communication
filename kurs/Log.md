@@ -11,3 +11,6 @@
 
 ## Gün 5 — Bits (25.11.2026)
 - **Bit mask islemleri ve volatile kavramini ogrendim**
+
+## Gün 6 — Bits (28.11.2026)
+- **Headers**
