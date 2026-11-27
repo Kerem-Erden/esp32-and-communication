@@ -12,7 +12,7 @@ Hedef: projeyle ilgili soruların **%85–90'ına** ezber değil, anlayarak ceva
 * İncelenen kod: `../isuzu-diagnostic-system` → `firmware/esp32-gateway/main/` (main = `b98ccd5`, Codex öncesi).
   O repoda yalnızca okuma yapılır.
 
-## Her gün (30 dk, en fazla 1 saat)
+## Her gün 
 
 0. **Tekrar (≈2 dk):** önceki günlerden rastgele bir soru. Cevaplayamazsam o günün notuna dönerim.
 1. **Kavram (≈15 dk):** konu, proje hiç yokmuş gibi sıfırdan öğrenilir.
@@ -116,7 +116,7 @@ Gün 13 bu hattın sonuçlarını mülakat hikâyesi olarak anlatır.
 | `malloc` / heap | 18 |
 | `const` ve pointer | 19 |
 | Hata kodları ve kaynak temizleme | 20 |
-| Endianness, `union` | 24 |
+| Endianness, `union` | 24 |        
 | String, `char` dizisi, buffer taşması | 25, 29 |
 | Durum makinesi | 26 |
 
